@@ -48,7 +48,7 @@
       <div class="flex items-center gap-2">
         <span class="hidden text-[11px] font-bold uppercase tracking-wider text-slate-400 sm:inline">Ver como</span>
         <select id="roleSelect" aria-label="Cambiar de rol" class="rounded-xl border border-forest-900/15 bg-forest-50 px-3 py-2 text-xs font-bold text-forest-900 outline-none sm:text-sm">
-          <option value="producer">Productor</option><option value="engineer">Ingeniero</option><option value="admin">Administrador</option>
+          <option value="producer">Productor</option><option value="engineer">Ingeniero</option><option value="admin">Administrador</option><option value="forum">Foro (todos los roles)</option>
         </select>
       </div>
     </div>
@@ -71,6 +71,7 @@
       <button class="nav-role active flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold sm:text-sm" data-role="producer">🌾 Productor</button>
       <button class="nav-role flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold text-slate-500 sm:text-sm" data-role="engineer">🧑‍🌾 Ingeniero</button>
       <button class="nav-role flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold text-slate-500 sm:text-sm" data-role="admin">▦ Administrador</button>
+      <button class="nav-role flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold text-slate-500 sm:text-sm" data-role="forum">💬 Foro</button>
     </nav>
 
     <!-- PRODUCTOR -->
@@ -104,6 +105,10 @@
         <div class="max-w-xl"><p class="text-xs font-bold uppercase tracking-widest text-emerald-300">Asistencia técnica a tu alcance</p><h2 class="mt-2 text-2xl font-extrabold">¿Tenés un desafío en tu producción?</h2><p class="mt-2 text-sm leading-6 text-emerald-50/70">Contanos qué está pasando. Tu solicitud llegará a profesionales de la zona para coordinar el próximo paso.</p></div>
         <button id="openTicket" class="btn mt-5 w-full bg-white px-5 py-3 text-sm font-extrabold text-forest-950 hover:bg-emerald-50 sm:mt-0 sm:w-auto">Solicitar asistencia / visita <span>→</span></button>
       </div>
+      <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+        <p class="text-xs font-bold uppercase tracking-widest text-forest-600">03 · Seguimiento</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Mis solicitudes</h2>
+        <div id="myTickets" class="mt-4 space-y-2"></div>
+      </article>
     </section>
 
     <!-- INGENIERO -->
@@ -125,6 +130,28 @@
           <div class="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">Bandeja de trabajo</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Solicitudes de asistencia</h2><p class="mt-1 text-sm text-slate-500">Gestioná los tickets recibidos de productores.</p></div><span id="ticketCount" class="rounded-full bg-forest-100 px-3 py-1.5 text-xs font-bold text-forest-800">0 tickets</span></div>
           <div class="mb-4 flex flex-wrap gap-2"><button class="ticket-filter rounded-full bg-forest-900 px-3 py-1.5 text-xs font-bold text-white" data-filter="Todos">Todos</button><button class="ticket-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500" data-filter="Pendiente">Pendientes</button><button class="ticket-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500" data-filter="Aceptado / En Coordinación">En coordinación</button><button class="ticket-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500" data-filter="Finalizado">Finalizados</button></div>
           <div id="ticketList" class="space-y-3"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- FORO -->
+    <section id="forumView" class="view space-y-7">
+      <div class="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
+        <article class="h-fit rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <p class="text-xs font-bold uppercase tracking-widest text-forest-600">Comunidad</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Hacer una consulta</h2><p class="mt-1 text-sm text-slate-500">Compartí tu duda con productores e ingenieros de toda la provincia.</p>
+          <form id="threadForm" class="mt-4 space-y-3">
+            <input class="field" name="author" placeholder="Tu nombre" required />
+            <div class="grid grid-cols-2 gap-3"><select class="field text-sm" id="threadRegion" name="region"></select><select class="field text-sm" id="threadTopic" name="topic"></select></div>
+            <input class="field" name="title" maxlength="90" placeholder="Título breve de tu consulta" required />
+            <textarea class="field" name="body" rows="4" placeholder="Contá qué pasa, desde cuándo y qué probaste." required></textarea>
+            <p id="actorHint" class="text-xs text-slate-400"></p>
+            <button class="btn btn-primary w-full" type="submit">Publicar consulta</button>
+          </form>
+        </article>
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <h2 class="text-xl font-extrabold text-forest-950">Consultas de la comunidad</h2>
+          <div class="mt-4 grid gap-2 sm:grid-cols-3"><input id="forumSearch" class="field text-sm" placeholder="Buscar en el foro…" aria-label="Buscar en el foro" /><select id="forumRegion" class="field text-sm" aria-label="Filtrar por región"></select><select id="forumTopic" class="field text-sm" aria-label="Filtrar por tema"></select></div>
+          <div id="threadList" class="mt-4 space-y-3"></div>
         </article>
       </div>
     </section>
@@ -158,7 +185,7 @@
         <div class="table-wrap"><table><thead><tr><th>Productor</th><th>Finca / parcela</th><th>Región</th><th>Superficie</th><th>Rubro</th><th>Contacto</th></tr></thead><tbody id="producerTable"></tbody></table></div>
       </article>
     </section>
-    <footer class="mt-10 flex flex-col justify-between gap-2 border-t border-slate-200 pt-5 text-xs text-slate-400 sm:flex-row"><span>AgroJujuy · Padrón y Directorio Digital Agrícola</span><span>MVP académico · Datos de demostración · Sin backend productivo</span></footer>
+    <footer class="mt-10 flex flex-col justify-between gap-2 border-t border-slate-200 pt-5 text-xs text-slate-400 sm:flex-row"><span>AgroJujuy · Padrón y Directorio Digital Agrícola</span><span>MVP académico · Datos de demostración · Sin backend productivo · <button id="resetDemo" class="underline">Restablecer datos</button></span></footer>
   </main>
 
   <!-- Modal ticket -->
@@ -176,12 +203,19 @@
       </form>
     </div>
   </div>
-  <div id="toastHost" class="fixed bottom-4 left-1/2 z-[60] w-[calc(100%-32px)] max-w-sm -translate-x-1/2 space-y-2"></div>
+  <div id="threadModal" class="modal-backdrop fixed inset-0 z-50 items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+    <div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl sm:p-7">
+      <div class="mb-2 flex justify-end"><button id="closeThread" class="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-500" aria-label="Cerrar">✕</button></div>
+      <div id="threadDetail"></div>
+    </div>
+  </div>
+  <div id="toastHost" aria-live="polite" class="fixed bottom-4 left-1/2 z-[60] w-[calc(100%-32px)] max-w-sm -translate-x-1/2 space-y-2"></div>
 
 <script>
 (() => {
   const KEY = 'agrojujuy_mvp_v1';
   const regions = ['Yungas','Valles','Quebrada','Puna'];
+  const h0=h=>new Date(Date.now()-h*36e5).toISOString();
   const seed = {
     farms: [
       {id:1,name:'Finca El Algarrobal',region:'Valles',hectares:4.5,crop:'Hortalizas',producer:'María López',phone:'388 512 3040'},
@@ -197,27 +231,36 @@
     tickets: [
       {id:1001,producer:'María López',farm:'Finca El Algarrobal',region:'Valles',problem:'Necesito revisar la presión y distribución del riego por goteo.',phone:'388 512 3040',engineer:'Ing. Juan Pérez',status:'Pendiente',created:new Date().toISOString()},
       {id:1002,producer:'Carlos Cruz',farm:'Viñedos del Norte',region:'Quebrada',problem:'Consulta sobre manejo preventivo de enfermedades en vid.',phone:'388 498 2210',engineer:'Ing. Martín Ríos',status:'Aceptado / En Coordinación',created:new Date().toISOString()}
+    ],
+    meName:'María López',
+    threads: [
+      {id:1,pinned:true,title:'Cómo verificar tu matrícula CIAPA en la plataforma',body:'Los ingenieros nuevos quedan en estado pendiente hasta que el Colegio valida la matrícula. Una vez verificada, tu perfil aparece en el directorio para los productores.',author:'Colegio de Ingenieros',role:'admin',region:'Toda la provincia',topic:'Otros',created:h0(96),votes:6,replies:[]},
+      {id:2,title:'Hojas amarillas en tabaco joven: ¿falta de nitrógeno o un hongo?',body:'Plantas de unos 30 días. Las hojas de abajo se ponen amarillas y se secan desde el borde. Llovió mucho la semana pasada.',author:'Rosa Mamani',role:'producer',region:'Yungas',topic:'Sanidad vegetal',created:h0(30),votes:4,replies:[{id:21,author:'Ing. Ana Gutiérrez',role:'engineer',body:'Con exceso de lluvia suele ser lavado de nitrógeno, pero revisá la base del tallo: si hay manchas oscuras o humedad, puede ser un hongo. Si podés, mandá una foto por una solicitud de asistencia.',created:h0(22),best:true}]},
+      {id:3,title:'¿Cada cuánto conviene regar por goteo en suelos arenosos?',body:'Tengo hortalizas en 4 hectáreas y el agua se me va rápido. ¿Riegos cortos y frecuentes o largos y espaciados?',author:'María López',role:'producer',region:'Valles',topic:'Riego',created:h0(8),votes:2,replies:[{id:31,author:'Ing. Juan Pérez',role:'engineer',body:'En suelos arenosos conviene dividir el riego en pulsos cortos y más frecuentes para que el agua no se pierda en profundidad.',created:h0(5)}]}
     ]
   };
   let db;
   try { db = JSON.parse(localStorage.getItem(KEY)) || structuredClone(seed); } catch { db = JSON.parse(JSON.stringify(seed)); }
-  const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+  db.threads ??= JSON.parse(JSON.stringify(seed.threads)); db.meName ??= seed.meName; db.voted ??= [];
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const initials = name => name.replace(/^Ing\.\s*/,'').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
-  let ticketFilter = 'Todos';
+  let ticketFilter = 'Todos', actor = 'producer', openThread = null;
   const titles = {
     producer:['Conectamos el campo con conocimiento','Encontrá profesionales matriculados y solicitá asistencia técnica para tu producción.'],
     engineer:['Tu experiencia, más cerca del productor','Organizá tus solicitudes, actualizá tu disponibilidad y coordiná asistencia en territorio.'],
     admin:['Información clara para decisiones institucionales','Un tablero de gestión para acompañar el padrón y fortalecer la vinculación profesional.']
   };
+  titles.forum=['Foro de la comunidad agrícola','Consultas, experiencias y respuestas entre productores e ingenieros de toda la provincia.'];
   function setRole(role) {
+    if(role!=='forum')actor=role;
     $('roleSelect').value = role;
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     $(role+'View').classList.add('active');
     document.querySelectorAll('.nav-role').forEach(b=>b.classList.toggle('active',b.dataset.role===role));
     $('pageTitle').textContent=titles[role][0]; $('pageSubtitle').textContent=titles[role][1];
-    render();
+    render(); fillProfile();
   }
   $('roleSelect').addEventListener('change',e=>setRole(e.target.value));
   document.querySelectorAll('.nav-role').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
@@ -262,20 +305,60 @@
     const rows=db.farms.filter(f=>(!r||f.region===r)&&[f.producer,f.name,f.crop].join(' ').toLowerCase().includes(q));
     $('producerTable').innerHTML=rows.length?rows.map(f=>`<tr><td class="font-bold">${esc(f.producer)}</td><td>${esc(f.name)}</td><td><span class="rounded-lg bg-forest-50 px-2 py-1 text-xs font-semibold text-forest-800">${esc(f.region)}</span></td><td>${esc(f.hectares)} ha</td><td>${esc(f.crop)}</td><td>${esc(f.phone||'—')}</td></tr>`).join(''):'<tr><td colspan="6" class="py-8 text-center text-slate-400">No hay registros que coincidan con la búsqueda.</td></tr>';
   }
-  function render(){renderFarms();renderEngineers();renderTicketOptions();renderTickets();renderAdmin();}
-  $('farmForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.farms.push({id:Date.now(),...d,hectares:Number(d.hectares),producer:'Productor de demostración',phone:''});save();e.target.reset();render();toast('Finca registrada correctamente.');});
+  function render(){renderFarms();renderEngineers();renderTicketOptions();renderTickets();renderAdmin();renderMyTickets();renderForum();}
+  $('farmForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.farms.push({id:Date.now(),...d,hectares:Number(d.hectares),producer:db.meName||'Productor de demostración',phone:''});save();e.target.reset();render();toast('Finca registrada correctamente.');});
   $('regionFilter').addEventListener('change',renderEngineers);$('specialtyFilter').addEventListener('change',renderEngineers);
   $('producerSearch').addEventListener('input',renderProducerTable);$('adminRegionFilter').addEventListener('change',renderProducerTable);
   document.querySelectorAll('.ticket-filter').forEach(b=>b.addEventListener('click',()=>{ticketFilter=b.dataset.filter;document.querySelectorAll('.ticket-filter').forEach(x=>{x.className='ticket-filter rounded-full px-3 py-1.5 text-xs font-bold '+(x===b?'bg-forest-900 text-white':'bg-slate-100 text-slate-500');});renderTickets();}));
-  $('profileForm').addEventListener('submit',e=>{e.preventDefault();$('profileSaved').classList.remove('hidden');toast('Perfil profesional guardado.');});
+  $('profileForm').addEventListener('submit',e=>{e.preventDefault();const g=n=>e.target.elements.namedItem(n),en=db.engineers.find(x=>x.id===1);en.name=g('name').value.trim();en.license=g('license').value.trim();en.specialty=g('specialty').value;const rs=[...g('regions').selectedOptions].map(o=>o.text);if(rs.length)en.regions=rs;en.active=$('activeLicense').checked;save();render();$('profileSaved').classList.remove('hidden');toast('Perfil guardado: ya se refleja en el directorio.');});
+  function fillProfile(){const en=db.engineers.find(x=>x.id===1);if(!en)return;const g=n=>$('profileForm').elements.namedItem(n);g('name').value=en.name;g('license').value=en.license;g('specialty').value=en.specialty;[...g('regions').options].forEach(o=>o.selected=en.regions.includes(o.text));$('activeLicense').checked=en.active;}
   $('addEngineerForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.engineers.push({id:Date.now(),name:d.name,license:d.license,specialty:d.specialty,regions:['Valles'],active:false,verified:false});save();e.target.reset();render();toast('Profesional agregado: requiere validación institucional.');});
-  function openTicket(engineerId){renderTicketOptions();if(engineerId){$('ticketEngineer').value=String(db.engineers.find(e=>e.id===engineerId)?.name||'');} $('ticketModal').classList.add('open');document.body.style.overflow='hidden';}
+  function openTicket(engineerId){renderTicketOptions();{const pf=$('ticketForm').elements.producer;if(!pf.value&&db.meName)pf.value=db.meName;}if(engineerId){$('ticketEngineer').value=String(db.engineers.find(e=>e.id===engineerId)?.name||'');} $('ticketModal').classList.add('open');document.body.style.overflow='hidden';}
   function closeTicket(){$('ticketModal').classList.remove('open');document.body.style.overflow='';}
   $('openTicket').addEventListener('click',()=>openTicket());$('closeModal').addEventListener('click',closeTicket);
   $('ticketModal').addEventListener('click',e=>{if(e.target===$('ticketModal'))closeTicket();});
-  $('ticketForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const farm=db.farms.find(f=>f.name===d.farm);db.tickets.push({id:Date.now(),producer:d.producer,farm:d.farm,region:farm?.region||'Sin especificar',problem:d.problem,phone:d.phone,engineer:d.engineer,status:'Pendiente',created:new Date().toISOString()});if(farm){farm.producer=d.producer;farm.phone=d.phone;}save();e.target.reset();closeTicket();render();toast('Ticket de asesoramiento creado correctamente.');});
+  $('ticketForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const farm=db.farms.find(f=>f.name===d.farm);db.tickets.push({id:Date.now(),producer:d.producer,farm:d.farm,region:farm?.region||'Sin especificar',problem:d.problem,phone:d.phone,engineer:d.engineer,status:'Pendiente',created:new Date().toISOString()});if(farm){farm.producer=d.producer;farm.phone=d.phone;}db.meName=d.producer;save();e.target.reset();closeTicket();render();toast('Ticket de asesoramiento creado correctamente.');});
+  function renderMyTickets(){
+    const me=(db.meName||'').toLowerCase(), list=db.tickets.filter(t=>me&&t.producer.toLowerCase()===me).slice().reverse();
+    $('myTickets').innerHTML=list.length?list.map(t=>`<div class="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 py-3"><div class="min-w-0"><div class="truncate text-sm font-bold text-slate-700">${esc(t.farm)}</div><div class="mt-0.5 text-xs text-slate-400">${esc(t.engineer||'Asignación abierta')} · ${esc(t.problem.slice(0,70))}${t.problem.length>70?'…':''}</div></div><span class="pill ${statusClass(t.status)}">${esc(t.status)}</span></div>`).join(''):'<p class="text-sm text-slate-400">Cuando envíes una solicitud, vas a poder seguir su estado acá.</p>';
+  }
+  const fRegs=['Toda la provincia',...regions], topics=['Riego','Sanidad vegetal','Suelos','Clima','Comercialización','Otros'];
+  const optsH=(a,ph)=>(ph?`<option value="">${ph}</option>`:'')+a.map(v=>`<option>${v}</option>`).join('');
+  $('threadRegion').innerHTML=optsH(fRegs);$('threadTopic').innerHTML=optsH(topics);$('forumRegion').innerHTML=optsH(fRegs,'Todas las regiones');$('forumTopic').innerHTML=optsH(topics,'Todos los temas');
+  const roleLabel={producer:'Productor',engineer:'Ingeniero',admin:'Institucional'}, roleCls={producer:'bg-amber-50 text-amber-800',engineer:'bg-emerald-50 text-emerald-800',admin:'bg-sky-50 text-sky-800'};
+  const rb=r=>`<span class="pill ${roleCls[r]}">${r==='engineer'?'✓ ':''}${roleLabel[r]}</span>`;
+  const ago=iso=>{const m=Math.round((Date.now()-new Date(iso))/6e4);return m<1?'recién':m<60?`hace ${m} min`:m<1440?`hace ${Math.round(m/60)} h`:`hace ${Math.round(m/1440)} d`;};
+  function renderForum(){
+    $('actorHint').textContent='Publicás como: '+roleLabel[actor]+'. Cambiá de rol arriba para participar con otro perfil.';
+    const q=$('forumSearch').value.toLowerCase(),r=$('forumRegion').value,tp=$('forumTopic').value;
+    const list=db.threads.filter(x=>(!r||x.region===r)&&(!tp||x.topic===tp)&&[x.title,x.body,x.author].join(' ').toLowerCase().includes(q)).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||new Date(b.created)-new Date(a.created));
+    $('threadList').innerHTML=list.length?list.map(x=>`<button class="block w-full rounded-2xl border border-slate-100 p-4 text-left hover:bg-forest-50" data-thread="${x.id}"><div class="flex flex-wrap items-center gap-2">${x.pinned?'<span class="pill bg-sky-50 text-sky-800">📌 Fijado</span>':''}<span class="pill bg-slate-100 text-slate-600">${esc(x.topic)}</span><span class="pill bg-forest-50 text-forest-800">${esc(x.region)}</span>${x.replies.some(p=>p.best)?'<span class="pill status-finalizado">✓ Resuelto</span>':''}</div><div class="mt-2 text-sm font-extrabold text-forest-950">${esc(x.title)}</div><div class="mt-1 text-xs text-slate-500">${esc(x.author)} · ${ago(x.created)} · ${x.replies.length} respuestas · 👍 ${x.votes}</div></button>`).join(''):'<div class="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">No hay consultas con esos filtros. Publicá la primera.</div>';
+    document.querySelectorAll('[data-thread]').forEach(b=>b.addEventListener('click',()=>{openThread=Number(b.dataset.thread);renderThread();$('threadModal').classList.add('open');document.body.style.overflow='hidden';}));
+    if(openThread)renderThread();
+  }
+  function closeThread(){openThread=null;$('threadModal').classList.remove('open');document.body.style.overflow='';}
+  function renderThread(){
+    const x=db.threads.find(t=>t.id===openThread); if(!x){closeThread();return;}
+    const voted=db.voted.includes('t'+x.id), canBest=actor==='producer'&&x.role==='producer', adm=actor==='admin';
+    const nm={producer:db.meName||'',engineer:'Ing. Juan Pérez',admin:'Colegio de Ingenieros'}[actor];
+    $('threadDetail').innerHTML=`<div class="flex flex-wrap gap-2"><span class="pill bg-slate-100 text-slate-600">${esc(x.topic)}</span><span class="pill bg-forest-50 text-forest-800">${esc(x.region)}</span></div><h2 class="mt-2 text-xl font-extrabold text-forest-950">${esc(x.title)}</h2><div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">${esc(x.author)} ${rb(x.role)} · ${ago(x.created)}</div><p class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">${esc(x.body)}</p><div class="mt-3 flex flex-wrap gap-2"><button class="btn ${voted?'btn-primary':'btn-light'} text-xs" data-act="vote">👍 Útil (${x.votes})</button>${adm?`<button class="btn btn-outline text-xs" data-act="pin">${x.pinned?'Desfijar':'Fijar arriba'}</button><button class="btn btn-outline text-xs" data-act="delT">Eliminar consulta</button>`:''}</div><h3 class="mt-6 border-t border-slate-100 pt-4 text-sm font-extrabold text-forest-950">${x.replies.length} respuestas</h3><div class="mt-3 space-y-3">${x.replies.map(p=>`<div class="rounded-2xl border p-4 ${p.best?'border-emerald-300 bg-emerald-50':'border-slate-100'}">${p.best?'<div class="mb-1 text-xs font-bold text-emerald-700">✓ Mejor respuesta</div>':''}<div class="flex flex-wrap items-center gap-2 text-xs text-slate-500"><b class="text-slate-700">${esc(p.author)}</b> ${rb(p.role)} · ${ago(p.created)}</div><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-700">${esc(p.body)}</p><div class="mt-2 flex gap-3">${canBest?`<button class="text-xs font-bold text-forest-700 underline" data-act="best" data-id="${p.id}">${p.best?'Quitar marca':'Marcar como mejor respuesta'}</button>`:''}${adm?`<button class="text-xs font-bold text-red-700 underline" data-act="delR" data-id="${p.id}">Eliminar</button>`:''}</div></div>`).join('')||'<p class="text-sm text-slate-400">Todavía nadie respondió. Podés ser la primera persona en ayudar.</p>'}</div><form id="replyForm" class="mt-5 space-y-3"><input class="field" name="author" value="${esc(nm)}" placeholder="Tu nombre" required /><textarea class="field" name="body" rows="3" placeholder="Escribí tu respuesta…" required></textarea><button class="btn btn-primary w-full" type="submit">Responder como ${roleLabel[actor].toLowerCase()}</button></form>`;
+  }
+  $('threadDetail').addEventListener('click',e=>{
+    const b=e.target.closest('[data-act]'),x=db.threads.find(t=>t.id===openThread); if(!b||!x)return; const a=b.dataset.act,id=Number(b.dataset.id);
+    if(a==='vote'){const k='t'+x.id,i=db.voted.indexOf(k);if(i<0){db.voted.push(k);x.votes++;}else{db.voted.splice(i,1);x.votes--;}}
+    else if(a==='pin')x.pinned=!x.pinned;
+    else if(a==='delT'){db.threads=db.threads.filter(t=>t!==x);closeThread();toast('Consulta eliminada.');}
+    else if(a==='delR'){x.replies=x.replies.filter(p=>p.id!==id);toast('Respuesta eliminada.');}
+    else if(a==='best'){const p=x.replies.find(r=>r.id===id),was=p.best;x.replies.forEach(r=>r.best=false);p.best=!was;}
+    save();render();
+  });
+  $('threadDetail').addEventListener('submit',e=>{e.preventDefault();const x=db.threads.find(t=>t.id===openThread);if(!x)return;const d=Object.fromEntries(new FormData(e.target));x.replies.push({id:Date.now(),author:d.author.trim(),role:actor,body:d.body.trim(),created:new Date().toISOString()});if(actor==='producer')db.meName=d.author.trim();save();render();toast('Respuesta publicada.');});
+  $('threadForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.threads.push({id:Date.now(),title:d.title.trim(),body:d.body.trim(),author:d.author.trim(),role:actor,region:d.region,topic:d.topic,created:new Date().toISOString(),votes:0,replies:[]});if(actor==='producer')db.meName=d.author.trim();save();e.target.reset();render();toast('Consulta publicada en el foro.');});
+  $('forumSearch').addEventListener('input',renderForum);$('forumRegion').addEventListener('change',renderForum);$('forumTopic').addEventListener('change',renderForum);
+  $('closeThread').addEventListener('click',closeThread);$('threadModal').addEventListener('click',e=>{if(e.target===$('threadModal'))closeThread();});
+  $('resetDemo').addEventListener('click',()=>{db=JSON.parse(JSON.stringify(seed));save();render();fillProfile();toast('Datos de demostración restablecidos.');});
   // Datos de demostración: las fincas iniciales se vinculan a productores ficticios.
-  render();
+  render(); fillProfile();
 })();
 </script>
 </body>
