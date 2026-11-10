@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#173f32" />
+  <title>Padrón y Directorio Digital Agrícola de Jujuy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: {
+      forest: { 950:'#102b23', 900:'#173f32', 800:'#205442', 700:'#2c6a52', 600:'#3c8063', 100:'#e8f1eb', 50:'#f4f8f5' },
+      sand: '#f5f3ec'
+    }, boxShadow: { soft:'0 12px 35px rgba(16,43,35,.08)' } } } };
+  </script>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input, select, textarea { font: inherit; }
+    .view { display:none; } .view.active { display:block; }
+    .nav-role.active { background:#173f32;color:#fff;box-shadow:0 4px 12px #173f3222; }
+    .field { width:100%; border:1px solid #dce4de; border-radius:12px; padding:12px 14px; background:#fff; outline:none; transition:.2s; }
+    .field:focus { border-color:#3c8063; box-shadow:0 0 0 3px #3c806322; }
+    .btn { display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:11px 16px;font-weight:650;transition:.18s; }
+    .btn-primary { background:#205442;color:white; } .btn-primary:hover { background:#173f32; transform:translateY(-1px); }
+    .btn-light { background:#edf3ee;color:#205442; } .btn-light:hover { background:#e1ebe3; }
+    .btn-outline { border:1px solid #d7e1d9;color:#315b48;background:white; } .btn-outline:hover { background:#f4f8f5; }
+    .pill { display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;letter-spacing:.02em; }
+    .status-pendiente { background:#fff3d9;color:#966414; } .status-aceptado { background:#e5f0ff;color:#285c9a; } .status-finalizado { background:#e6f4eb;color:#267044; }
+    .table-wrap { overflow-x:auto; } table { border-collapse:collapse;width:100%;white-space:nowrap; } th { text-align:left;color:#718078;font-size:11px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;padding:13px 16px;background:#f7f9f7; } td { padding:14px 16px;border-top:1px solid #edf1ed;font-size:13px;color:#33443a; }
+    .avatar { width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#e1eee4,#c5dacb);color:#205442;font-weight:800;flex:none; }
+    .metric { background:linear-gradient(135deg,#fff,#f7faf7);border:1px solid #e8eee9;border-radius:18px;padding:19px; }
+    .bar { height:9px;border-radius:99px;background:#e9efea;overflow:hidden; } .bar > span { display:block;height:100%;border-radius:99px;background:#4f8b68; }
+    .modal-backdrop { display:none; } .modal-backdrop.open { display:flex; }
+    .toast { animation:slide .25s ease-out; } @keyframes slide { from {opacity:0;transform:translateY(8px)} to {opacity:1;transform:translateY(0)} }
+    @media (max-width:640px) { .mobile-pad { padding-left:16px;padding-right:16px; } .mobile-title { font-size:27px;line-height:1.12; } }
+  </style>
+</head>
+<body class="bg-[#f6f8f6] text-slate-800">
+  <header class="sticky top-0 z-30 border-b border-forest-900/10 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <div class="flex min-w-0 items-center gap-3">
+        <div class="grid h-10 w-10 flex-none place-items-center rounded-xl bg-forest-900 text-xl text-white">🌱</div>
+        <div class="min-w-0">
+          <div class="truncate text-sm font-extrabold tracking-tight text-forest-950 sm:text-base">AgroJujuy <span class="font-medium text-slate-400">/ Directorio Digital</span></div>
+          <div class="hidden text-[11px] text-slate-500 sm:block">Padrón y vinculación de asistencia técnica provincial</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="hidden text-[11px] font-bold uppercase tracking-wider text-slate-400 sm:inline">Ver como</span>
+        <select id="roleSelect" aria-label="Cambiar de rol" class="rounded-xl border border-forest-900/15 bg-forest-50 px-3 py-2 text-xs font-bold text-forest-900 outline-none sm:text-sm">
+          <option value="producer">Productor</option><option value="engineer">Ingeniero</option><option value="admin">Administrador</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 pb-16 pt-7 sm:px-6 sm:pt-10">
+    <section class="mb-7 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+      <div>
+        <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-forest-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-forest-800"><span class="h-1.5 w-1.5 rounded-full bg-forest-600"></span> Prototipo académico · MVP</div>
+        <h1 id="pageTitle" class="mobile-title text-3xl font-extrabold tracking-tight text-forest-950 sm:text-4xl">Conectamos el campo con conocimiento</h1>
+        <p id="pageSubtitle" class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Encontrá profesionales matriculados y solicitá asistencia técnica para tu producción.</p>
+      </div>
+      <div class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <span class="grid h-9 w-9 place-items-center rounded-xl bg-forest-50 text-lg">📍</span>
+        <div><div class="text-xs font-bold text-slate-700">Jujuy, Argentina</div><div class="text-[11px] text-slate-400">Quebrada · Valles · Yungas · Puna</div></div>
+      </div>
+    </section>
+
+    <nav class="mb-7 flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm" aria-label="Vistas del prototipo">
+      <button class="nav-role active flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold sm:text-sm" data-role="producer">🌾 Productor</button>
+      <button class="nav-role flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold text-slate-500 sm:text-sm" data-role="engineer">🧑‍🌾 Ingeniero</button>
+      <button class="nav-role flex-1 whitespace-nowrap rounded-xl px-4 py-3 text-xs font-bold text-slate-500 sm:text-sm" data-role="admin">▦ Administrador</button>
+    </nav>
+
+    <!-- PRODUCTOR -->
+    <section id="producerView" class="view active space-y-7">
+      <div class="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <div class="mb-5 flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">01 · Tu unidad productiva</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Mis Fincas / Parcelas</h2><p class="mt-1 text-sm text-slate-500">Registrá los datos principales de tu finca.</p></div><span class="text-2xl">🏡</span></div>
+          <form id="farmForm" class="space-y-3">
+            <input class="field" name="name" placeholder="Nombre de la finca o parcela" required />
+            <div class="grid grid-cols-2 gap-3">
+              <select class="field" name="region" required><option value="">Región</option><option>Yungas</option><option>Valles</option><option>Quebrada</option><option>Puna</option></select>
+              <input class="field" name="hectares" type="number" min="0.1" step="0.1" placeholder="Hectáreas" required />
+            </div>
+            <select class="field" name="crop" required><option value="">Rubro principal</option><option>Tabaco</option><option>Vid</option><option>Hortalizas</option><option>Frutos tropicales</option><option>Granos y legumbres</option><option>Ganadería</option><option>Otro</option></select>
+            <button class="btn btn-primary w-full py-3 text-sm" type="submit">＋ Registrar finca</button>
+          </form>
+          <div class="my-5 border-t border-slate-100"></div>
+          <div id="farmList" class="space-y-2"></div>
+        </article>
+
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <div class="mb-5 flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">02 · Directorio profesional</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Buscar asesoramiento técnico</h2><p class="mt-1 text-sm text-slate-500">Filtrá por tu zona y el tema que necesitás resolver.</p></div><span class="text-2xl">🔎</span></div>
+          <div class="grid grid-cols-2 gap-3">
+            <select id="regionFilter" class="field text-sm"><option value="">Todas las regiones</option><option>Yungas</option><option>Valles</option><option>Quebrada</option><option>Puna</option></select>
+            <select id="specialtyFilter" class="field text-sm"><option value="">Todas las especialidades</option><option>Sistemas de Riego</option><option>Sanidad Vegetal</option><option>Vitivinicultura</option><option>Suelos y Fertilidad</option><option>Producción Hortícola</option></select>
+          </div>
+          <div id="engineerCards" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+        </article>
+      </div>
+      <div class="rounded-3xl bg-forest-950 p-6 text-white sm:flex sm:items-center sm:justify-between sm:p-8">
+        <div class="max-w-xl"><p class="text-xs font-bold uppercase tracking-widest text-emerald-300">Asistencia técnica a tu alcance</p><h2 class="mt-2 text-2xl font-extrabold">¿Tenés un desafío en tu producción?</h2><p class="mt-2 text-sm leading-6 text-emerald-50/70">Contanos qué está pasando. Tu solicitud llegará a profesionales de la zona para coordinar el próximo paso.</p></div>
+        <button id="openTicket" class="btn mt-5 w-full bg-white px-5 py-3 text-sm font-extrabold text-forest-950 hover:bg-emerald-50 sm:mt-0 sm:w-auto">Solicitar asistencia / visita <span>→</span></button>
+      </div>
+    </section>
+
+    <!-- INGENIERO -->
+    <section id="engineerView" class="view space-y-7">
+      <div class="grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <div class="mb-5 flex items-center gap-3"><div class="avatar text-xl">JP</div><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">Perfil profesional</p><h2 class="text-xl font-extrabold text-forest-950">Mi perfil y matrícula</h2></div></div>
+          <form id="profileForm" class="space-y-3">
+            <label class="block text-xs font-bold text-slate-500">Nombre profesional<input class="field mt-1" name="name" value="Ing. Juan Pérez" required /></label>
+            <label class="block text-xs font-bold text-slate-500">Matrícula CIAPA<input class="field mt-1" name="license" value="CIAPA 2841" required /></label>
+            <label class="block text-xs font-bold text-slate-500">Especialidades acreditadas<select class="field mt-1" name="specialty"><option>Sistemas de Riego</option><option>Sanidad Vegetal</option><option>Vitivinicultura</option><option>Suelos y Fertilidad</option><option>Producción Hortícola</option></select></label>
+            <label class="block text-xs font-bold text-slate-500">Zonas de cobertura<select class="field mt-1" name="regions" multiple size="4"><option selected>Valles</option><option>Yungas</option><option>Quebrada</option><option>Puna</option></select><span class="mt-1 block font-normal text-slate-400">Usá Ctrl / ⌘ para seleccionar varias zonas.</span></label>
+            <label class="flex items-center gap-3 rounded-xl bg-forest-50 p-3 text-sm font-semibold text-forest-900"><input id="activeLicense" type="checkbox" checked class="h-4 w-4 accent-forest-700" /> Ejercicio profesional activo</label>
+            <button class="btn btn-primary w-full" type="submit">Guardar perfil</button>
+          </form>
+          <p id="profileSaved" class="mt-3 hidden text-xs font-semibold text-emerald-700">✓ Perfil actualizado en este prototipo.</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <div class="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">Bandeja de trabajo</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Solicitudes de asistencia</h2><p class="mt-1 text-sm text-slate-500">Gestioná los tickets recibidos de productores.</p></div><span id="ticketCount" class="rounded-full bg-forest-100 px-3 py-1.5 text-xs font-bold text-forest-800">0 tickets</span></div>
+          <div class="mb-4 flex flex-wrap gap-2"><button class="ticket-filter rounded-full bg-forest-900 px-3 py-1.5 text-xs font-bold text-white" data-filter="Todos">Todos</button><button class="ticket-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500" data-filter="Pendiente">Pendientes</button><button class="ticket-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500" data-filter="Aceptado / En Coordinación">En coordinación</button><button class="ticket-filter rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500" data-filter="Finalizado">Finalizados</button></div>
+          <div id="ticketList" class="space-y-3"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="adminView" class="view space-y-7">
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="metric"><div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-500">Ingenieros activos</span><span class="text-xl">🧑‍🔬</span></div><div id="metricEngineers" class="mt-3 text-3xl font-extrabold text-forest-950">0</div><div class="mt-1 text-xs text-emerald-700">Matrículas vigentes</div></div>
+        <div class="metric"><div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-500">Productores registrados</span><span class="text-xl">🌱</span></div><div id="metricProducers" class="mt-3 text-3xl font-extrabold text-forest-950">0</div><div class="mt-1 text-xs text-slate-400">Padrón provincial</div></div>
+        <div class="metric"><div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-500">Solicitudes del mes</span><span class="text-xl">📨</span></div><div id="metricTickets" class="mt-3 text-3xl font-extrabold text-forest-950">0</div><div class="mt-1 text-xs text-slate-400">Tickets emitidos</div></div>
+        <div class="metric"><div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-500">Fincas registradas</span><span class="text-xl">🏡</span></div><div id="metricFarms" class="mt-3 text-3xl font-extrabold text-forest-950">0</div><div class="mt-1 text-xs text-slate-400">Unidades productivas</div></div>
+      </div>
+      <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <p class="text-xs font-bold uppercase tracking-widest text-forest-600">MIS · Indicadores clave</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Productores por región</h2><p class="mt-1 text-sm text-slate-500">Distribución del padrón según ubicación declarada.</p>
+          <div id="regionChart" class="mt-6 space-y-5"></div>
+        </article>
+        <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-7">
+          <p class="text-xs font-bold uppercase tracking-widest text-forest-600">Gobernanza del padrón</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Gestión de matrículas</h2><p class="mt-1 text-sm text-slate-500">Verificá el estado de habilitación profesional.</p>
+          <div id="licenseList" class="mt-4 space-y-3"></div>
+          <form id="addEngineerForm" class="mt-5 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2">
+            <input class="field text-sm" name="name" placeholder="Nombre del profesional" required />
+            <input class="field text-sm" name="license" placeholder="N.º matrícula CIAPA" required />
+            <select class="field text-sm sm:col-span-2" name="specialty"><option>Sistemas de Riego</option><option>Sanidad Vegetal</option><option>Vitivinicultura</option><option>Suelos y Fertilidad</option><option>Producción Hortícola</option></select>
+            <button class="btn btn-primary text-sm sm:col-span-2" type="submit">＋ Dar de alta profesional</button>
+          </form>
+        </article>
+      </div>
+      <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+        <div class="flex flex-col justify-between gap-3 p-5 sm:flex-row sm:items-end sm:p-7"><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">Registro provincial</p><h2 class="mt-1 text-xl font-extrabold text-forest-950">Padrón provincial de productores</h2><p class="mt-1 text-sm text-slate-500">Consulta y filtrado de las unidades productivas registradas.</p></div><div class="flex flex-col gap-2 sm:flex-row"><input id="producerSearch" class="field text-sm sm:w-56" placeholder="Buscar productor o finca…" /><select id="adminRegionFilter" class="field text-sm sm:w-40"><option value="">Todas las regiones</option><option>Yungas</option><option>Valles</option><option>Quebrada</option><option>Puna</option></select></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Productor</th><th>Finca / parcela</th><th>Región</th><th>Superficie</th><th>Rubro</th><th>Contacto</th></tr></thead><tbody id="producerTable"></tbody></table></div>
+      </article>
+    </section>
+    <footer class="mt-10 flex flex-col justify-between gap-2 border-t border-slate-200 pt-5 text-xs text-slate-400 sm:flex-row"><span>AgroJujuy · Padrón y Directorio Digital Agrícola</span><span>MVP académico · Datos de demostración · Sin backend productivo</span></footer>
+  </main>
+
+  <!-- Modal ticket -->
+  <div id="ticketModal" class="modal-backdrop fixed inset-0 z-50 items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+    <div class="w-full max-w-lg rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl sm:p-7">
+      <div class="mb-5 flex items-start justify-between"><div><p class="text-xs font-bold uppercase tracking-widest text-forest-600">Nueva solicitud</p><h2 class="mt-1 text-2xl font-extrabold text-forest-950">Contanos qué necesitás</h2><p class="mt-1 text-sm text-slate-500">Vamos a generar un ticket para seguimiento.</p></div><button id="closeModal" class="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-500" aria-label="Cerrar">✕</button></div>
+      <form id="ticketForm" class="space-y-3">
+        <label class="block text-xs font-bold text-slate-500">Tu nombre<input class="field mt-1" name="producer" placeholder="Nombre y apellido" required /></label>
+        <label class="block text-xs font-bold text-slate-500">Finca / parcela<select class="field mt-1" id="ticketFarm" name="farm" required></select></label>
+        <label class="block text-xs font-bold text-slate-500">Ingeniero al que solicitás asistencia<select class="field mt-1" id="ticketEngineer" name="engineer"><option value="">Asignación abierta / cualquiera disponible</option></select></label>
+        <label class="block text-xs font-bold text-slate-500">Describí tu problema o necesidad<textarea class="field mt-1" name="problem" rows="3" placeholder="Ej.: necesito revisar el sistema de riego por goteo…" required></textarea></label>
+        <label class="block text-xs font-bold text-slate-500">Teléfono / WhatsApp de contacto<input class="field mt-1" name="phone" type="tel" placeholder="Ej.: 388 456 7890" required /></label>
+        <button class="btn btn-primary w-full py-3" type="submit">Enviar solicitud <span>→</span></button>
+        <p class="text-center text-[11px] text-slate-400">Envío simulado: el ticket se guarda localmente en este navegador.</p>
+      </form>
+    </div>
+  </div>
+  <div id="toastHost" class="fixed bottom-4 left-1/2 z-[60] w-[calc(100%-32px)] max-w-sm -translate-x-1/2 space-y-2"></div>
+
+<script>
+(() => {
+  const KEY = 'agrojujuy_mvp_v1';
+  const regions = ['Yungas','Valles','Quebrada','Puna'];
+  const seed = {
+    farms: [
+      {id:1,name:'Finca El Algarrobal',region:'Valles',hectares:4.5,crop:'Hortalizas',producer:'María López',phone:'388 512 3040'},
+      {id:2,name:'Viñedos del Norte',region:'Quebrada',hectares:2.2,crop:'Vid',producer:'Carlos Cruz',phone:'388 498 2210'},
+      {id:3,name:'La Esperanza',region:'Yungas',hectares:8,crop:'Tabaco',producer:'Rosa Mamani',phone:'388 455 1122'}
+    ],
+    engineers: [
+      {id:1,name:'Ing. Juan Pérez',license:'CIAPA 2841',specialty:'Sistemas de Riego',regions:['Valles','Yungas'],active:true,verified:true},
+      {id:2,name:'Ing. Ana Gutiérrez',license:'CIAPA 3190',specialty:'Sanidad Vegetal',regions:['Quebrada','Valles'],active:true,verified:true},
+      {id:3,name:'Ing. Martín Ríos',license:'CIAPA 2765',specialty:'Vitivinicultura',regions:['Quebrada'],active:true,verified:true},
+      {id:4,name:'Ing. Lucía Vargas',license:'CIAPA 3302',specialty:'Suelos y Fertilidad',regions:['Puna','Quebrada'],active:false,verified:false}
+    ],
+    tickets: [
+      {id:1001,producer:'María López',farm:'Finca El Algarrobal',region:'Valles',problem:'Necesito revisar la presión y distribución del riego por goteo.',phone:'388 512 3040',engineer:'Ing. Juan Pérez',status:'Pendiente',created:new Date().toISOString()},
+      {id:1002,producer:'Carlos Cruz',farm:'Viñedos del Norte',region:'Quebrada',problem:'Consulta sobre manejo preventivo de enfermedades en vid.',phone:'388 498 2210',engineer:'Ing. Martín Ríos',status:'Aceptado / En Coordinación',created:new Date().toISOString()}
+    ]
+  };
+  let db;
+  try { db = JSON.parse(localStorage.getItem(KEY)) || structuredClone(seed); } catch { db = JSON.parse(JSON.stringify(seed)); }
+  const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const initials = name => name.replace(/^Ing\.\s*/,'').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+  let ticketFilter = 'Todos';
+  const titles = {
+    producer:['Conectamos el campo con conocimiento','Encontrá profesionales matriculados y solicitá asistencia técnica para tu producción.'],
+    engineer:['Tu experiencia, más cerca del productor','Organizá tus solicitudes, actualizá tu disponibilidad y coordiná asistencia en territorio.'],
+    admin:['Información clara para decisiones institucionales','Un tablero de gestión para acompañar el padrón y fortalecer la vinculación profesional.']
+  };
+  function setRole(role) {
+    $('roleSelect').value = role;
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    $(role+'View').classList.add('active');
+    document.querySelectorAll('.nav-role').forEach(b=>b.classList.toggle('active',b.dataset.role===role));
+    $('pageTitle').textContent=titles[role][0]; $('pageSubtitle').textContent=titles[role][1];
+    render();
+  }
+  $('roleSelect').addEventListener('change',e=>setRole(e.target.value));
+  document.querySelectorAll('.nav-role').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
+  function toast(message) {
+    const node=document.createElement('div'); node.className='toast rounded-2xl bg-forest-950 px-4 py-3 text-sm font-semibold text-white shadow-xl'; node.textContent=message;
+    $('toastHost').append(node); setTimeout(()=>node.remove(),3200);
+  }
+  function renderFarms() {
+    $('farmList').innerHTML = db.farms.length ? db.farms.map(f=>`<div class="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-3"><div class="min-w-0"><div class="truncate text-sm font-bold text-slate-700">${esc(f.name)}</div><div class="mt-0.5 text-xs text-slate-400">${esc(f.region)} · ${esc(f.hectares)} ha · ${esc(f.crop)}</div></div><span class="rounded-lg bg-white px-2 py-1 text-[10px] font-bold text-forest-700">Registrada</span></div>`).join('') : '<p class="text-sm text-slate-400">Todavía no registraste fincas.</p>';
+  }
+  function renderEngineers() {
+    const region=$('regionFilter').value, specialty=$('specialtyFilter').value;
+    const list=db.engineers.filter(e=>e.active&&e.verified&&(!region||e.regions.includes(region))&&(!specialty||e.specialty===specialty));
+    $('engineerCards').innerHTML=list.length?list.map(e=>`<div class="rounded-2xl border border-slate-100 p-4"><div class="flex items-center gap-3"><div class="avatar">${initials(e.name)}</div><div class="min-w-0"><div class="truncate text-sm font-extrabold text-forest-950">${esc(e.name)}</div><div class="mt-0.5 text-[11px] font-semibold text-emerald-700">✓ ${esc(e.license)} · Matrícula verificada</div></div></div><div class="mt-3 text-xs text-slate-600"><span class="font-bold">Especialidad:</span> ${esc(e.specialty)}</div><div class="mt-1 text-xs text-slate-500"><span class="font-bold">Cobertura:</span> ${e.regions.map(esc).join(', ')}</div><button class="btn btn-light mt-3 w-full text-xs" data-request="${e.id}">Solicitar asistencia <span>→</span></button></div>`).join(''):'<div class="rounded-xl bg-slate-50 p-4 text-sm text-slate-500 sm:col-span-2">No encontramos profesionales activos con esos filtros. Probá ampliar la búsqueda.</div>';
+    document.querySelectorAll('[data-request]').forEach(b=>b.addEventListener('click',()=>openTicket(Number(b.dataset.request))));
+  }
+  function renderTicketOptions() {
+    $('ticketFarm').innerHTML='<option value="">Seleccioná una finca</option>'+db.farms.map(f=>`<option value="${esc(f.name)}">${esc(f.name)} · ${esc(f.region)}</option>`).join('');
+    $('ticketEngineer').innerHTML='<option value="">Asignación abierta / cualquiera disponible</option>'+db.engineers.filter(e=>e.active&&e.verified).map(e=>`<option value="${esc(e.name)}">${esc(e.name)} · ${esc(e.specialty)}</option>`).join('');
+  }
+  function renderTickets() {
+    const list=db.tickets.filter(t=>ticketFilter==='Todos'||t.status===ticketFilter);
+    $('ticketCount').textContent=db.tickets.length+' tickets';
+    $('ticketList').innerHTML=list.length?list.slice().reverse().map(t=>`<div class="rounded-2xl border border-slate-100 p-4"><div class="flex flex-wrap items-start justify-between gap-2"><div><div class="text-sm font-extrabold text-forest-950">${esc(t.farm)}</div><div class="mt-1 text-xs text-slate-500">${esc(t.producer)} · ${esc(t.region)}</div></div><span class="pill ${statusClass(t.status)}">${esc(t.status)}</span></div><p class="mt-3 text-sm leading-5 text-slate-600">${esc(t.problem)}</p><div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3"><div class="text-xs text-slate-500">☎ ${esc(t.phone)} <span class="text-slate-300">·</span> ${esc(t.engineer||'Sin asignar')}</div><select class="field w-auto min-w-40 py-2 text-xs" data-status="${t.id}"><option ${t.status==='Pendiente'?'selected':''}>Pendiente</option><option ${t.status==='Aceptado / En Coordinación'?'selected':''}>Aceptado / En Coordinación</option><option ${t.status==='Finalizado'?'selected':''}>Finalizado</option></select></div></div>`).join(''):'<div class="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">No hay tickets en esta categoría.</div>';
+    document.querySelectorAll('[data-status]').forEach(s=>s.addEventListener('change',()=>{const t=db.tickets.find(x=>x.id===Number(s.dataset.status));if(t){t.status=s.value;save();render();toast('Estado del ticket actualizado.');}}));
+  }
+  function statusClass(s){return s==='Pendiente'?'status-pendiente':s==='Finalizado'?'status-finalizado':'status-aceptado';}
+  function renderAdmin() {
+    $('metricEngineers').textContent=db.engineers.filter(e=>e.active&&e.verified).length;
+    $('metricProducers').textContent=new Set(db.farms.map(f=>f.producer)).size;
+    const now=new Date(); $('metricTickets').textContent=db.tickets.filter(t=>{const d=new Date(t.created);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).length;
+    $('metricFarms').textContent=db.farms.length;
+    const counts=Object.fromEntries(regions.map(r=>[r,db.farms.filter(f=>f.region===r).length]));
+    const max=Math.max(1,...Object.values(counts));
+    $('regionChart').innerHTML=regions.map(r=>`<div><div class="mb-2 flex justify-between text-sm"><span class="font-semibold text-slate-700">${r}</span><span class="font-bold text-forest-800">${counts[r]} <span class="font-normal text-slate-400">fincas</span></span></div><div class="bar"><span style="width:${counts[r]/max*100}%"></span></div></div>`).join('');
+    $('licenseList').innerHTML=db.engineers.map(e=>`<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-100 p-3"><div class="flex items-center gap-3"><div class="avatar !h-10 !w-10 rounded-xl text-xs">${initials(e.name)}</div><div><div class="text-sm font-bold text-slate-700">${esc(e.name)}</div><div class="text-[11px] text-slate-400">${esc(e.license)} · ${esc(e.specialty)}</div></div></div><div class="flex items-center gap-2"><span class="pill ${e.active&&e.verified?'status-finalizado':'status-pendiente'}">${e.active&&e.verified?'Verificada':'Pendiente / suspendida'}</span><button class="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-bold text-slate-600" data-toggle-license="${e.id}">${e.active&&e.verified?'Suspender':'Verificar / activar'}</button></div></div>`).join('');
+    document.querySelectorAll('[data-toggle-license]').forEach(b=>b.addEventListener('click',()=>{const e=db.engineers.find(x=>x.id===Number(b.dataset.toggleLicense));e.active=!(e.active&&e.verified);e.verified=e.active;save();render();toast(e.active?'Matrícula verificada y activa.':'Matrícula suspendida.');}));
+    renderProducerTable();
+  }
+  function renderProducerTable() {
+    const q=$('producerSearch').value.toLowerCase(), r=$('adminRegionFilter').value;
+    const rows=db.farms.filter(f=>(!r||f.region===r)&&[f.producer,f.name,f.crop].join(' ').toLowerCase().includes(q));
+    $('producerTable').innerHTML=rows.length?rows.map(f=>`<tr><td class="font-bold">${esc(f.producer)}</td><td>${esc(f.name)}</td><td><span class="rounded-lg bg-forest-50 px-2 py-1 text-xs font-semibold text-forest-800">${esc(f.region)}</span></td><td>${esc(f.hectares)} ha</td><td>${esc(f.crop)}</td><td>${esc(f.phone||'—')}</td></tr>`).join(''):'<tr><td colspan="6" class="py-8 text-center text-slate-400">No hay registros que coincidan con la búsqueda.</td></tr>';
+  }
+  function render(){renderFarms();renderEngineers();renderTicketOptions();renderTickets();renderAdmin();}
+  $('farmForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.farms.push({id:Date.now(),...d,hectares:Number(d.hectares),producer:'Productor de demostración',phone:''});save();e.target.reset();render();toast('Finca registrada correctamente.');});
+  $('regionFilter').addEventListener('change',renderEngineers);$('specialtyFilter').addEventListener('change',renderEngineers);
+  $('producerSearch').addEventListener('input',renderProducerTable);$('adminRegionFilter').addEventListener('change',renderProducerTable);
+  document.querySelectorAll('.ticket-filter').forEach(b=>b.addEventListener('click',()=>{ticketFilter=b.dataset.filter;document.querySelectorAll('.ticket-filter').forEach(x=>{x.className='ticket-filter rounded-full px-3 py-1.5 text-xs font-bold '+(x===b?'bg-forest-900 text-white':'bg-slate-100 text-slate-500');});renderTickets();}));
+  $('profileForm').addEventListener('submit',e=>{e.preventDefault();$('profileSaved').classList.remove('hidden');toast('Perfil profesional guardado.');});
+  $('addEngineerForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));db.engineers.push({id:Date.now(),name:d.name,license:d.license,specialty:d.specialty,regions:['Valles'],active:false,verified:false});save();e.target.reset();render();toast('Profesional agregado: requiere validación institucional.');});
+  function openTicket(engineerId){renderTicketOptions();if(engineerId){$('ticketEngineer').value=String(db.engineers.find(e=>e.id===engineerId)?.name||'');} $('ticketModal').classList.add('open');document.body.style.overflow='hidden';}
+  function closeTicket(){$('ticketModal').classList.remove('open');document.body.style.overflow='';}
+  $('openTicket').addEventListener('click',()=>openTicket());$('closeModal').addEventListener('click',closeTicket);
+  $('ticketModal').addEventListener('click',e=>{if(e.target===$('ticketModal'))closeTicket();});
+  $('ticketForm').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const farm=db.farms.find(f=>f.name===d.farm);db.tickets.push({id:Date.now(),producer:d.producer,farm:d.farm,region:farm?.region||'Sin especificar',problem:d.problem,phone:d.phone,engineer:d.engineer,status:'Pendiente',created:new Date().toISOString()});if(farm){farm.producer=d.producer;farm.phone=d.phone;}save();e.target.reset();closeTicket();render();toast('Ticket de asesoramiento creado correctamente.');});
+  // Datos de demostración: las fincas iniciales se vinculan a productores ficticios.
+  render();
+})();
+</script>
+</body>
+</html>
